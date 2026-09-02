@@ -1,5 +1,5 @@
 /**
- * API client for QuizRush backend
+ * API client for QuizSpark backend
  */
 
 const API_BASE_URL = "/api";

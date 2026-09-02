@@ -1,7 +1,7 @@
 {
-  "name": "quizrush-backend",
+  "name": "quizspark-backend",
   "version": "1.0.0",
-  "description": "QuizRush backend API - Express.js with TypeScript",
+  "description": "QuizSpark backend API - Express.js with TypeScript",
   "main": "dist/index.js",
   "type": "module",
   "scripts": {
