@@ -11,7 +11,7 @@ Teachers can create quizzes, host live game sessions, and broadcast questions in
 * **Teacher Dashboard:** Secure authentication to create, edit, and manage an unlimited number of quizzes.
 * **Frictionless Joining:** Students do not need accounts. They simply enter a Game PIN and a nickname to start playing immediately.
 * **Live Leaderboards & Analytics:** Tracks right/wrong answers and automatically calculates player accuracy and rankings at the end of the game.
-* **Mobile-First Design:** Fully responsive player screens that work perfectly on any mobile browser.
+* **Mobile First Design:** Fully responsive player screens that work perfectly on any mobile browser.
 
 ## Technology Stack
 
@@ -25,7 +25,7 @@ Teachers can create quizzes, host live game sessions, and broadcast questions in
 * [Node.js](https://nodejs.org/) & [Express.js](https://expressjs.com/) (API routing)
 * [Socket.io](https://socket.io/) (WebSockets for real-time multiplayer)
 * [PostgreSQL](https://www.postgresql.org/) (Relational database)
-* [Prisma ORM](https://www.prisma.io/) (Type-safe database access)
+* [Prisma ORM](https://www.prisma.io/) (Type safe database access)
 * [JSON Web Tokens (JWT)](https://jwt.io/) (Secure authentication)
 
 ---
