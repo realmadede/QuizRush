@@ -1,6 +1,6 @@
-# QuizRush Backend
+# QuizSpark Backend
 
-A Node.js + Express + TypeScript backend for the QuizRush real-time quiz application.
+A Node.js + Express + TypeScript backend for the QuizRush real time quiz application.
 
 ## Stack
 
