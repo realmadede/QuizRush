@@ -1,0 +1,210 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * QuizArena design system — "Chalk & Coral".
+ * Deep ink navy + warm chalk surfaces, coral/amber accents.
+ * All colors are oklch semantic tokens. Never hardcode colors in components.
+ */
+
+@theme inline {
+  --font-display: "Golos Text", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Golos Text", ui-sans-serif, system-ui, sans-serif;
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+  --color-ink: var(--ink);
+  --color-ink-foreground: var(--ink-foreground);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-panel: var(--ink-panel);
+  --color-quiz-1: var(--quiz-1);
+  --color-quiz-2: var(--quiz-2);
+  --color-quiz-3: var(--quiz-3);
+  --color-quiz-4: var(--quiz-4);
+  --color-quiz-5: var(--quiz-5);
+  --color-quiz-6: var(--quiz-6);
+  --color-quiz-foreground: var(--quiz-foreground);
+  --color-chart-1: var(--quiz-1);
+  --color-chart-2: var(--quiz-2);
+  --color-chart-3: var(--quiz-3);
+  --color-chart-4: var(--quiz-4);
+  --color-chart-5: var(--quiz-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --shadow-card:
+    0 1px 2px oklch(0.25 0.05 250 / 0.06),
+    0 8px 24px oklch(0.25 0.05 250 / 0.08);
+  --shadow-pop: 0 18px 48px oklch(0.2 0.06 250 / 0.28);
+  --animate-pop-in: pop-in 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.4);
+  --animate-pulse-ring: pulse-ring 1.6s ease-in-out infinite;
+}
+
+:root {
+  --radius: 0.9rem;
+  --background: oklch(0.985 0.008 95);
+  --foreground: oklch(0.22 0.045 255);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.22 0.045 255);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.22 0.045 255);
+  --primary: oklch(0.47 0.13 232);
+  --primary-foreground: oklch(0.99 0.005 95);
+  --secondary: oklch(0.95 0.02 240);
+  --secondary-foreground: oklch(0.28 0.05 250);
+  --muted: oklch(0.955 0.012 100);
+  --muted-foreground: oklch(0.53 0.03 250);
+  --accent: oklch(0.72 0.17 45);
+  --accent-foreground: oklch(0.2 0.04 40);
+  --destructive: oklch(0.585 0.21 25);
+  --destructive-foreground: oklch(0.99 0.005 95);
+  --success: oklch(0.63 0.15 155);
+  --success-foreground: oklch(0.99 0.005 95);
+  --border: oklch(0.9 0.015 250);
+  --input: oklch(0.9 0.015 250);
+  --ring: oklch(0.47 0.13 232);
+
+  --ink: oklch(0.22 0.055 258);
+  --ink-panel: oklch(0.28 0.055 258);
+  --ink-muted: oklch(0.72 0.03 250);
+  --ink-foreground: oklch(0.985 0.008 95);
+
+  --quiz-1: oklch(0.6 0.2 25);
+  --quiz-2: oklch(0.6 0.16 245);
+  --quiz-3: oklch(0.72 0.16 75);
+  --quiz-4: oklch(0.62 0.15 155);
+  --quiz-5: oklch(0.55 0.15 305);
+  --quiz-6: oklch(0.62 0.13 195);
+  --quiz-foreground: oklch(0.99 0.005 95);
+
+  --sidebar: oklch(0.22 0.055 258);
+  --sidebar-foreground: oklch(0.93 0.01 250);
+  --sidebar-primary: oklch(0.72 0.17 45);
+  --sidebar-primary-foreground: oklch(0.2 0.04 40);
+  --sidebar-accent: oklch(0.28 0.055 258);
+  --sidebar-accent-foreground: oklch(0.98 0.005 95);
+  --sidebar-border: oklch(0.32 0.05 258);
+  --sidebar-ring: oklch(0.72 0.17 45);
+}
+
+.dark {
+  --background: oklch(0.19 0.05 258);
+  --foreground: oklch(0.97 0.008 95);
+  --card: oklch(0.24 0.05 258);
+  --card-foreground: oklch(0.97 0.008 95);
+  --popover: oklch(0.24 0.05 258);
+  --popover-foreground: oklch(0.97 0.008 95);
+  --primary: oklch(0.68 0.13 232);
+  --primary-foreground: oklch(0.18 0.05 258);
+  --secondary: oklch(0.3 0.05 258);
+  --secondary-foreground: oklch(0.97 0.008 95);
+  --muted: oklch(0.28 0.045 258);
+  --muted-foreground: oklch(0.74 0.025 250);
+  --accent: oklch(0.75 0.16 45);
+  --accent-foreground: oklch(0.2 0.04 40);
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 16%);
+  --ring: oklch(0.68 0.13 232);
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.94) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes pulse-ring {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.75;
+    transform: scale(1.03);
+  }
+}
+
+@utility ink-surface {
+  background:
+    radial-gradient(
+      120% 90% at 12% 0%,
+      oklch(0.34 0.09 250 / 0.75),
+      transparent 60%
+    ),
+    radial-gradient(
+      90% 80% at 92% 100%,
+      oklch(0.4 0.12 30 / 0.4),
+      transparent 62%
+    ),
+    var(--ink);
+  color: var(--ink-foreground);
+}
+
+@utility display-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+}

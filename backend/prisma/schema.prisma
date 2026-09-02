@@ -1,0 +1,191 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AppRole {
+  admin
+  teacher
+}
+
+enum SessionStatus {
+  lobby
+  question
+  results
+  leaderboard
+  finished
+}
+
+model Profile {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  fullName  String?
+  password  String // Hashed password
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  userRoles       UserRole[]
+  quizzes         Quiz[]
+  gameSessions    GameSession[]
+  @@map("profiles")
+}
+
+model UserRole {
+  id        String   @id @default(uuid())
+  userId    String
+  role      AppRole
+  createdAt DateTime @default(now())
+
+  // Relations
+  user      Profile  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, role])
+  @@map("user_roles")
+}
+
+model Quiz {
+  id          String   @id @default(uuid())
+  ownerId     String
+  title       String
+  description String?
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  owner      Profile         @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  questions  Question[]
+  sessions   GameSession[]
+
+  @@index([ownerId])
+  @@map("quizzes")
+}
+
+model Question {
+  id              String   @id @default(uuid())
+  quizId          String
+  position        Int
+  text            String
+  timeLimitSeconds Int     @default(20)
+  points          Int     @default(1000)
+  createdAt       DateTime @default(now())
+
+  // Relations
+  quiz            Quiz              @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  answers         Answer[]
+  playerAnswers   PlayerAnswer[]
+
+  @@unique([quizId, position])
+  @@index([quizId])
+  @@map("questions")
+}
+
+model Answer {
+  id         String   @id @default(uuid())
+  questionId String
+  position   Int
+  text       String
+  isCorrect  Boolean  @default(false)
+
+  // Relations
+  question   Question       @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  playerAnswers PlayerAnswer[]
+
+  @@unique([questionId, position])
+  @@index([questionId])
+  @@map("answers")
+}
+
+model GameSession {
+  id                   String        @id @default(uuid())
+  quizId               String
+  hostId               String
+  pin                  String        @unique
+  status               SessionStatus @default(lobby)
+  currentQuestionIndex Int           @default(-1)
+  questionStartedAt    DateTime?
+  questionEndsAt       DateTime?
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+  endedAt              DateTime?
+
+  // Relations
+  quiz        Quiz           @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  host        Profile        @relation(fields: [hostId], references: [id], onDelete: Cascade)
+  players     Player[]
+  playerAnswers PlayerAnswer[]
+  gameResults GameResult[]
+
+  @@index([hostId])
+  @@index([pin])
+  @@map("game_sessions")
+}
+
+model Player {
+  id        String   @id @default(uuid())
+  sessionId String
+  nickname  String
+  score     Int      @default(0)
+  token     String   @unique @default(uuid())
+  connected Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  // Relations
+  session   GameSession    @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  answers   PlayerAnswer[]
+  result    GameResult?
+
+  @@unique([sessionId, nickname])
+  @@index([sessionId])
+  @@map("players")
+}
+
+model PlayerAnswer {
+  id           String   @id @default(uuid())
+  playerId     String
+  sessionId    String
+  questionId   String
+  answerId     String?
+  isCorrect    Boolean  @default(false)
+  pointsAwarded Int     @default(0)
+  responseMs   Int      @default(0)
+  createdAt    DateTime @default(now())
+
+  // Relations
+  player       Player        @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  session      GameSession   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  question     Question      @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  answer       Answer?       @relation(fields: [answerId], references: [id], onDelete: SetNull)
+
+  @@unique([playerId, questionId])
+  @@index([sessionId, questionId])
+  @@map("player_answers")
+}
+
+model GameResult {
+  id           String   @id @default(uuid())
+  sessionId    String
+  playerId     String   @unique
+  nickname     String
+  finalScore   Int      @default(0)
+  rank         Int
+  correctCount Int      @default(0)
+  totalAnswered Int    @default(0)
+  createdAt    DateTime @default(now())
+
+  // Relations
+  session      GameSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  player       Player      @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, playerId])
+  @@index([sessionId])
+  @@map("game_results")
+}
