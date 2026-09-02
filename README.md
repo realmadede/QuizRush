@@ -13,7 +13,7 @@ Teachers can create quizzes, host live game sessions, and broadcast questions in
 * **Live Leaderboards & Analytics:** Tracks right/wrong answers and automatically calculates player accuracy and rankings at the end of the game.
 * **Mobile-First Design:** Fully responsive player screens that work perfectly on any mobile browser.
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 **Frontend (Client)**
 * [React 19](https://react.dev/) & [Vite](https://vitejs.dev/)
