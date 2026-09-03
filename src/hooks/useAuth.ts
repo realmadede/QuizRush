@@ -11,7 +11,7 @@ export function useAuth() {
   const [session, setSession] = useState<{ user: User } | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error] = useState<string | null>(null);
 
   useEffect(() => {
     // Check if token exists in localStorage and verify it

@@ -25,7 +25,7 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction) 
   next();
 }
 
-export function optionalAuthMiddleware(req: Request, res: Response, next: NextFunction) {
+export function optionalAuthMiddleware(req: Request, _res: Response, next: NextFunction) {
   const token = extractToken(req.headers.authorization);
 
   if (token) {

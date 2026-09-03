@@ -1,9 +1,11 @@
 import { Router, Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 import { z } from 'zod';
 import { prisma } from '../index';
 import { generateToken } from '../utils/jwt';
 import { authMiddleware } from '../middleware/auth';
+import { sendPasswordResetEmail } from '../utils/mailer';
 
 const router = Router();
 
@@ -146,3 +148,78 @@ router.get('/me', authMiddleware, async (req: Request, res: Response) => {
 });
 
 export default router;
+
+const forgotPasswordSchema = z.object({
+  email: z.string().email(),
+});
+
+const resetPasswordSchema = z.object({
+  token: z.string(),
+  password: z.string().min(8),
+});
+
+// Forgot password
+router.post('/forgot-password', async (req: Request, res: Response) => {
+  try {
+    const data = forgotPasswordSchema.parse(req.body);
+    const user = await prisma.profile.findUnique({ where: { email: data.email } });
+
+    if (user) {
+      const resetToken = crypto.randomBytes(32).toString('hex');
+      const resetTokenExpiresAt = new Date(Date.now() + 3600000); // 1 hour
+
+      await prisma.profile.update({
+        where: { id: user.id },
+        data: { resetToken, resetTokenExpiresAt },
+      });
+
+      // Usually it's better to use FRONTEND_URL or deriving it from req
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+      const resetLink = `${frontendUrl}/reset-password?token=${resetToken}`;
+
+      await sendPasswordResetEmail(user.email, resetLink);
+    }
+
+    // Always return success to prevent email enumeration
+    return res.json({ ok: true });
+  } catch (error) {
+    if (error instanceof z.ZodError) return res.status(400).json({ error: error.errors });
+    console.error(error);
+    return res.status(500).json({ error: 'Failed to request reset' });
+  }
+});
+
+// Reset password
+router.post('/reset-password', async (req: Request, res: Response) => {
+  try {
+    const data = resetPasswordSchema.parse(req.body);
+
+    const user = await prisma.profile.findFirst({
+      where: {
+        resetToken: data.token,
+        resetTokenExpiresAt: { gt: new Date() },
+      },
+    });
+
+    if (!user) {
+      return res.status(400).json({ error: 'Invalid or expired reset link' });
+    }
+
+    const hashedPassword = await bcrypt.hash(data.password, 10);
+
+    await prisma.profile.update({
+      where: { id: user.id },
+      data: {
+        password: hashedPassword,
+        resetToken: null,
+        resetTokenExpiresAt: null,
+      },
+    });
+
+    return res.json({ ok: true });
+  } catch (error) {
+    if (error instanceof z.ZodError) return res.status(400).json({ error: error.errors });
+    console.error(error);
+    return res.status(500).json({ error: 'Failed to reset password' });
+  }
+});

@@ -27,9 +27,11 @@ model Profile {
   id        String   @id @default(uuid())
   email     String   @unique
   fullName  String?
-  password  String // Hashed password
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  password            String // Hashed password
+  resetToken          String?
+  resetTokenExpiresAt DateTime?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 
   // Relations
   userRoles       UserRole[]
