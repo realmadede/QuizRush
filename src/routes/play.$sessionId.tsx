@@ -356,7 +356,7 @@ function PlayPage() {
               <button
                 key={a.id}
                 type="button"
-                disabled={answered || answerMutation.isPending}
+                disabled={answerMutation.isPending}
                 onClick={() => answerMutation.mutate(a.id)}
                 className={`min-h-24 rounded-2xl px-5 py-4 text-left text-lg font-bold text-quiz-foreground transition ${
                   optionStyle(i).bg
@@ -373,7 +373,7 @@ function PlayPage() {
 
         <p className="mt-6 text-center text-sm text-ink-muted">
           {answered
-            ? "Answer locked in — waiting for everyone else."
+            ? "Answer recorded! Tap another option to change it."
             : "Tap an answer. Faster = more points."}
         </p>
       </div>

@@ -84,7 +84,7 @@ export const getSessionReport = async (sessionId: string) => {
   let totalCorrect = 0;
   let totalAnswers = 0;
 
-  const standings = session.players.map((p, i) => {
+  const standings = session.leaderboard.map((p, i) => {
     totalCorrect += p.correct;
     totalAnswers += p.answered;
     

@@ -11,9 +11,9 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/")({
-  validateSearch: (search: Record<string, unknown>) => {
+  validateSearch: (search: Record<string, unknown>): { pin?: string | undefined } => {
     return {
-      pin: search.pin as string | undefined,
+      pin: search['pin'] as string | undefined,
     };
   },
   head: () => ({
@@ -42,7 +42,7 @@ function Index() {
   const navigate = useNavigate();
   const search = Route.useSearch();
   const { user } = useAuth();
-  const [pin, setPin] = useState(search.pin || "");
+  const [pin, setPin] = useState(String(search.pin || ""));
   const [nickname, setNickname] = useState("");
 
   const mutation = useMutation({

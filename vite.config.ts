@@ -14,6 +14,7 @@ export default defineConfig({
     tsConfigPaths(),
   ],
   server: {
+    host: true,
     proxy: {
       '/api': {
         target: 'http://localhost:5000',

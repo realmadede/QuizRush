@@ -202,38 +202,52 @@ router.post('/answer', async (req: Request, res: Response) => {
       },
     });
 
-    if (existingAnswer) {
-      return res.status(400).json({ error: 'Already answered this question' });
-    }
+    const newPoints = answer.isCorrect ? points : 0;
+    let pointsDiff = 0;
 
-    // Record answer
-    await prisma.playerAnswer.create({
-      data: {
-        playerId: data.playerId,
-        sessionId: session.id,
-        questionId: question.id,
-        answerId: data.answerId,
-        isCorrect: answer.isCorrect,
-        pointsAwarded: answer.isCorrect ? points : 0,
-        responseMs,
-      },
-    });
+    if (existingAnswer) {
+      pointsDiff = newPoints - existingAnswer.pointsAwarded;
+      await prisma.playerAnswer.update({
+        where: { id: existingAnswer.id },
+        data: {
+          answerId: data.answerId,
+          isCorrect: answer.isCorrect,
+          pointsAwarded: newPoints,
+          responseMs,
+        },
+      });
+    } else {
+      pointsDiff = newPoints;
+      await prisma.playerAnswer.create({
+        data: {
+          playerId: data.playerId,
+          sessionId: session.id,
+          questionId: question.id,
+          answerId: data.answerId,
+          isCorrect: answer.isCorrect,
+          pointsAwarded: newPoints,
+          responseMs,
+        },
+      });
+    }
 
     // Update player score
     await prisma.player.update({
       where: { id: data.playerId },
       data: {
-        score: player.score + (answer.isCorrect ? points : 0),
+        score: player.score + pointsDiff,
       },
     });
 
     // Notify host of answer
-    io.to(`session:${session.id}`).emit('answer_submitted', {
-      playerId: data.playerId,
-      isCorrect: answer.isCorrect,
-    });
+    if (!existingAnswer) {
+      io.to(`session:${session.id}`).emit('answer_submitted', {
+        playerId: data.playerId,
+        isCorrect: answer.isCorrect,
+      });
+    }
 
-    return res.json({ pointsAwarded: answer.isCorrect ? points : 0 });
+    return res.json({ pointsAwarded: newPoints });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return res.status(400).json({ error: error.errors });

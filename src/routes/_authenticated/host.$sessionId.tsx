@@ -64,6 +64,12 @@ function HostPage() {
   const data = state.data;
   const seconds = useCountdownLabel(data?.endsAt, now);
 
+  useEffect(() => {
+    if (data?.phase === "question" && seconds === 0 && !actionMutation.isPending) {
+      actionMutation.mutate("end_question");
+    }
+  }, [data?.phase, seconds, actionMutation]);
+
   if (state.isLoading || !data) {
     return (
       <main className="ink-surface min-h-screen p-10 text-ink-muted">
