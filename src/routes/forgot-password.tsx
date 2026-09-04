@@ -22,8 +22,8 @@ function ForgotPasswordPage() {
       await authAPI.forgotPassword(email.trim());
       setSent(true);
       toast.success("Password reset link sent to your email.");
-    } catch (error: any) {
-      toast.error(error.message || "Failed to request reset.");
+    } catch (error: Error | unknown) {
+      toast.error((error instanceof Error ? error.message : "") || "Failed to request reset.");
     } finally {
       setBusy(false);
     }

@@ -70,6 +70,7 @@ router.post('/state', async (req: Request, res: Response) => {
     const leaderboard = allPlayers.map((p) => ({
       id: p.id,
       nickname: p.nickname,
+      avatar: p.avatar,
       score: p.score,
     }));
 
@@ -129,6 +130,7 @@ router.post('/state', async (req: Request, res: Response) => {
         rank,
         score: player.score,
         nickname: player.nickname,
+        avatar: player.avatar,
       },
       leaderboard,
     });

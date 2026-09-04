@@ -26,6 +26,7 @@ const createSessionSchema = z.object({
 const joinSessionSchema = z.object({
   pin: z.string().regex(/^\d{6}$/, 'PIN must be 6 digits'),
   nickname: z.string().min(1).max(20),
+  avatar: z.string().min(1).max(10).optional(),
 });
 
 const hostActionSchema = z.object({
@@ -58,6 +59,10 @@ router.post('/', authMiddleware, async (req: Request, res: Response) => {
       return res.status(403).json({ error: 'Unauthorized' });
     }
 
+    if (!quiz.isPublished) {
+      return res.status(400).json({ error: 'Cannot start a session for an unpublished quiz.' });
+    }
+
     if (quiz.questions.length === 0) {
       return res.status(400).json({ error: 'Add at least one question before starting a game' });
     }
@@ -87,7 +92,6 @@ router.post('/', authMiddleware, async (req: Request, res: Response) => {
 
 // Join game session
 router.post('/join', optionalAuthMiddleware, async (req: Request, res: Response) => {
-  console.log(`[POST /sessions/join] from IP:`, req.ip, `body:`, req.body);
   try {
     const data = joinSessionSchema.parse(req.body);
 
@@ -117,6 +121,7 @@ router.post('/join', optionalAuthMiddleware, async (req: Request, res: Response)
       data: {
         sessionId: session.id,
         nickname: data.nickname,
+        avatar: data.avatar || '🦊',
       },
     });
 
@@ -124,6 +129,7 @@ router.post('/join', optionalAuthMiddleware, async (req: Request, res: Response)
     io.to(`session:${session.id}`).emit('player_joined', {
       playerId: player.id,
       nickname: player.nickname,
+      avatar: player.avatar,
     });
 
     return res.status(201).json({
@@ -132,6 +138,7 @@ router.post('/join', optionalAuthMiddleware, async (req: Request, res: Response)
       playerId: player.id,
       token: player.token,
       nickname: player.nickname,
+      avatar: player.avatar,
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -225,6 +232,7 @@ router.get('/:sessionId', optionalAuthMiddleware, async (req: Request, res: Resp
         return {
           id: p.id,
           nickname: p.nickname,
+          avatar: p.avatar,
           score: p.score,
           correct,
           answered,

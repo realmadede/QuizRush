@@ -257,11 +257,15 @@ function Dashboard() {
                     <Button
                       size="sm"
                       disabled={
-                        launchMutation.isPending || quiz.questionCount === 0
+                        launchMutation.isPending ||
+                        quiz.questionCount === 0 ||
+                        !quiz.isPublished
                       }
                       onClick={() => launchMutation.mutate(quiz.id)}
                     >
-                      Start live game
+                      {!quiz.isPublished
+                        ? "Publish to play"
+                        : "Start live game"}
                     </Button>
                     <Button asChild size="sm" variant="outline">
                       <Link to="/quizzes/$quizId" params={{ quizId: quiz.id }}>

@@ -6,7 +6,7 @@ import { prisma } from '../index';
  */
 export function initializeSocket(io: Server) {
   io.on('connection', (socket: Socket) => {
-    console.log('🔌 Player connected:', socket.id);
+    console.log('Player connected:', socket.id);
 
     // Join session room
     socket.on(
@@ -77,7 +77,7 @@ export function initializeSocket(io: Server) {
 
     // Disconnect
     socket.on('disconnect', async () => {
-      console.log('🔌 Player disconnected:', socket.id);
+      console.log('Player disconnected:', socket.id);
 
       if (socket.data?.playerId) {
         try {

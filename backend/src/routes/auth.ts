@@ -160,7 +160,7 @@ router.put('/me', authMiddleware, async (req: Request, res: Response) => {
 
     if (!currentUser) return res.status(404).json({ error: 'User not found' });
 
-    const updateData: any = {};
+    const updateData: Record<string, string | null | Date> = {};
     if (data.fullName !== undefined) updateData.fullName = data.fullName;
 
     let emailVerificationSent = false;

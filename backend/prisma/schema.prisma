@@ -137,6 +137,7 @@ model Player {
   id        String   @id @default(uuid())
   sessionId String
   nickname  String
+  avatar    String   @default("🦊")
   score     Int      @default(0)
   token     String   @unique @default(uuid())
   connected Boolean  @default(true)

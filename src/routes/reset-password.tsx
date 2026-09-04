@@ -50,9 +50,10 @@ function ResetPasswordPage() {
       await authAPI.resetPassword(token!, password);
       toast.success("Password updated successfully! Please sign in.");
       navigate({ to: "/auth", replace: true });
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error(
-        error.message || "Failed to reset password. The link may have expired.",
+        (error instanceof Error ? error.message : "") ||
+          "Failed to reset password. The link may have expired.",
       );
     } finally {
       setBusy(false);

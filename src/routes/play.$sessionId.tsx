@@ -39,9 +39,9 @@ function PlayPage() {
   const { sessionId } = Route.useParams();
   const navigate = useNavigate();
   const [player, setPlayer] = useState<PlayerCredentials | null>(null);
-  const [players, setPlayers] = useState<{ id: string; nickname: string }[]>(
-    [],
-  );
+  const [players, setPlayers] = useState<
+    { id: string; nickname: string; avatar?: string }[]
+  >([]);
 
   useEffect(() => {
     const saved = loadPlayer(sessionId);
@@ -55,7 +55,7 @@ function PlayPage() {
   const state = useQuery({
     queryKey: ["player-state", player?.playerId],
     enabled: !!player,
-    refetchInterval: 800,
+    refetchInterval: 400,
     queryFn: () => playerAPI.getState(player!.playerId, player!.token),
   });
 
@@ -170,7 +170,9 @@ function PlayPage() {
             </form>
           ) : (
             <>
-              <h1 className="display-title mt-3 text-4xl">{player.nickname}</h1>
+              <h1 className="display-title mt-3 text-4xl">
+                {player.avatar} {player.nickname}
+              </h1>
               <Button
                 variant="ghost"
                 size="sm"
@@ -203,7 +205,7 @@ function PlayPage() {
                     : "bg-white/10 text-ink-foreground"
                 }`}
               >
-                {p.nickname}
+                {p.avatar} {p.nickname}
               </li>
             ))}
           </ul>
@@ -235,17 +237,27 @@ function PlayPage() {
             {data.player.nickname} · {data.player.score} points
           </p>
           <ol className="mx-auto mt-8 w-72 space-y-2 text-left">
-            {data.leaderboard.map((p: any, i: number) => (
-              <li
-                key={p.id}
-                className="flex justify-between rounded-xl bg-white/10 px-4 py-2"
-              >
-                <span>
-                  {i + 1}. {p.nickname}
-                </span>
-                <span className="font-bold">{p.score}</span>
-              </li>
-            ))}
+            {data.leaderboard.map(
+              (
+                p: {
+                  id: string;
+                  nickname: string;
+                  score: number;
+                  avatar?: string;
+                },
+                i: number,
+              ) => (
+                <li
+                  key={p.id}
+                  className="flex justify-between rounded-xl bg-white/10 px-4 py-2"
+                >
+                  <span>
+                    {i + 1}. {p.avatar} {p.nickname}
+                  </span>
+                  <span className="font-bold">{p.score}</span>
+                </li>
+              ),
+            )}
           </ol>
           <Button
             variant="ghost"
@@ -271,17 +283,27 @@ function PlayPage() {
             #{data.player.rank} · {data.player.score} pts
           </h1>
           <ol className="mt-6 space-y-2 text-left">
-            {data.leaderboard.map((p: any, i: number) => (
-              <li
-                key={p.id}
-                className="flex justify-between rounded-xl bg-white/10 px-4 py-2"
-              >
-                <span>
-                  {i + 1}. {p.nickname}
-                </span>
-                <span className="font-bold">{p.score}</span>
-              </li>
-            ))}
+            {data.leaderboard.map(
+              (
+                p: {
+                  id: string;
+                  nickname: string;
+                  score: number;
+                  avatar?: string;
+                },
+                i: number,
+              ) => (
+                <li
+                  key={p.id}
+                  className="flex justify-between rounded-xl bg-white/10 px-4 py-2"
+                >
+                  <span>
+                    {i + 1}. {p.avatar} {p.nickname}
+                  </span>
+                  <span className="font-bold">{p.score}</span>
+                </li>
+              ),
+            )}
           </ol>
         </div>
       </main>
@@ -355,25 +377,27 @@ function PlayPage() {
         </h1>
 
         <div className="mt-8 grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2">
-          {question.answers.map((a: any, i: number) => {
-            const chosen = data.myAnswer?.answerId === a.id;
-            return (
-              <button
-                key={a.id}
-                type="button"
-                disabled={answerMutation.isPending}
-                onClick={() => answerMutation.mutate(a.id)}
-                className={`min-h-24 rounded-2xl px-5 py-4 text-left text-lg font-bold text-quiz-foreground transition ${
-                  optionStyle(i).bg
-                } ${answered && !chosen ? "opacity-40" : "active:scale-[0.98]"} ${
-                  chosen ? "ring-4 ring-white" : ""
-                }`}
-              >
-                <span className="mr-2">{optionStyle(i).shape}</span>
-                {a.text}
-              </button>
-            );
-          })}
+          {question.answers.map(
+            (a: { id: string; text: string }, i: number) => {
+              const chosen = data.myAnswer?.answerId === a.id;
+              return (
+                <button
+                  key={a.id}
+                  type="button"
+                  disabled={answerMutation.isPending}
+                  onClick={() => answerMutation.mutate(a.id)}
+                  className={`min-h-24 rounded-2xl px-5 py-4 text-left text-lg font-bold text-quiz-foreground transition ${
+                    optionStyle(i).bg
+                  } ${answered && !chosen ? "opacity-40" : "active:scale-[0.98]"} ${
+                    chosen ? "ring-4 ring-white" : ""
+                  }`}
+                >
+                  <span className="mr-2">{optionStyle(i).shape}</span>
+                  {a.text}
+                </button>
+              );
+            },
+          )}
         </div>
 
         <p className="mt-6 text-center text-sm text-ink-muted">

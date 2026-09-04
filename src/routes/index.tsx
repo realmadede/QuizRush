@@ -46,10 +46,13 @@ function Index() {
   const { user } = useAuth();
   const [pin, setPin] = useState(String(search.pin || ""));
   const [nickname, setNickname] = useState("");
+  const [avatar, setAvatar] = useState("🦊");
+
+  const AVATARS = ["🦊", "🦁", "🐼", "🐸", "🐙", "🐧", "🦖", "🦄", "👽", "🤖"];
 
   const mutation = useMutation({
-    mutationFn: (vars: { pin: string; nickname: string }) =>
-      sessionAPI.join(vars.pin, vars.nickname),
+    mutationFn: (vars: { pin: string; nickname: string; avatar: string }) =>
+      sessionAPI.join(vars.pin, vars.nickname, vars.avatar),
     onSuccess: (result) => {
       if (!result.ok) {
         toast.error(result.message);
@@ -60,6 +63,7 @@ function Index() {
         playerId: result.playerId!,
         token: result.token!,
         nickname: result.nickname!,
+        avatar: result.avatar || avatar,
       });
       navigate({
         to: "/play/$sessionId",
@@ -96,7 +100,11 @@ function Index() {
             className="mt-8 space-y-5"
             onSubmit={(e) => {
               e.preventDefault();
-              mutation.mutate({ pin: pin.trim(), nickname: nickname.trim() });
+              mutation.mutate({
+                pin: pin.trim(),
+                nickname: nickname.trim(),
+                avatar,
+              });
             }}
           >
             <div className="space-y-2">
@@ -123,6 +131,26 @@ function Index() {
                 onChange={(e) => setNickname(e.target.value)}
                 className="h-12 text-center text-lg"
               />
+            </div>
+
+            <div className="space-y-3 pt-2">
+              <Label>Choose your Avatar</Label>
+              <div className="grid grid-cols-5 gap-2">
+                {AVATARS.map((a) => (
+                  <button
+                    key={a}
+                    type="button"
+                    onClick={() => setAvatar(a)}
+                    className={`h-12 text-2xl flex items-center justify-center rounded-xl transition ${
+                      avatar === a
+                        ? "bg-primary text-primary-foreground scale-110 shadow-lg"
+                        : "bg-white/5 hover:bg-white/10 opacity-70 hover:opacity-100"
+                    }`}
+                  >
+                    {a}
+                  </button>
+                ))}
+              </div>
             </div>
 
             <Button

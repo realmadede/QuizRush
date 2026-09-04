@@ -153,10 +153,10 @@ function QuizEditor() {
             </div>
             <Button
               variant="outline"
-              disabled={launchMutation.isPending}
+              disabled={launchMutation.isPending || !isPublished}
               onClick={() => launchMutation.mutate()}
             >
-              Start live game
+              {!isPublished ? "Publish to play" : "Start live game"}
             </Button>
             <Button
               disabled={saveMutation.isPending}
@@ -306,26 +306,46 @@ function QuizEditor() {
           ))}
         </ol>
 
-        <Button
-          variant="outline"
-          className="mt-6"
-          onClick={() =>
-            setQuestions((prev) => [
-              ...prev,
-              {
-                text: "",
-                timeLimit: 20,
-                points: 1000,
-                answers: [
-                  { text: "", isCorrect: true },
-                  { text: "", isCorrect: false },
-                ],
-              },
-            ])
-          }
-        >
-          Add question
-        </Button>
+        <div className="mt-6 flex flex-wrap gap-3">
+          <Button
+            variant="outline"
+            onClick={() =>
+              setQuestions((prev) => [
+                ...prev,
+                {
+                  text: "",
+                  timeLimit: 20,
+                  points: 1000,
+                  answers: [
+                    { text: "", isCorrect: true },
+                    { text: "", isCorrect: false },
+                  ],
+                },
+              ])
+            }
+          >
+            Add multiple choice
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() =>
+              setQuestions((prev) => [
+                ...prev,
+                {
+                  text: "True or False: ",
+                  timeLimit: 15,
+                  points: 1000,
+                  answers: [
+                    { text: "True", isCorrect: true },
+                    { text: "False", isCorrect: false },
+                  ],
+                },
+              ])
+            }
+          >
+            Add True/False
+          </Button>
+        </div>
       </div>
     </main>
   );

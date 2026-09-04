@@ -38,7 +38,7 @@ async function request<T>(
   const data = await response.json().catch(() => ({}));
 
   if (!response.ok) {
-    const message = (data as any)?.error || response.statusText;
+    const message = (data as { error?: string })?.error || response.statusText;
     throw new APIError(response.status, response.statusText, message);
   }
 
@@ -184,7 +184,7 @@ export const sessionAPI = {
       body: JSON.stringify({ quizId }),
     }),
 
-  join: (pin: string, nickname: string) =>
+  join: (pin: string, nickname: string, avatar?: string) =>
     request<{
       ok: boolean;
       message?: string;
@@ -192,9 +192,10 @@ export const sessionAPI = {
       playerId?: string;
       token?: string;
       nickname?: string;
+      avatar?: string;
     }>("/sessions/join", {
       method: "POST",
-      body: JSON.stringify({ pin, nickname }),
+      body: JSON.stringify({ pin, nickname, avatar }),
     }),
 
   get: async (sessionId: string) => {
@@ -224,6 +225,7 @@ export const sessionAPI = {
       players: Array<{
         id: string;
         nickname: string;
+        avatar: string;
         score: number;
         correct: number;
         answered: number;
@@ -291,6 +293,7 @@ export const playerAPI = {
       leaderboard: Array<{
         id: string;
         nickname: string;
+        avatar?: string;
         score: number;
       }>;
     }>("/players/state", {

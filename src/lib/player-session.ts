@@ -3,6 +3,7 @@ export type PlayerCredentials = {
   playerId: string;
   token: string;
   nickname: string;
+  avatar: string;
 };
 
 const KEY = "quizarena.player";

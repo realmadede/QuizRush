@@ -152,7 +152,6 @@ router.post('/', authMiddleware, async (req: Request, res: Response) => {
 
 // Update quiz
 router.patch('/:quizId', authMiddleware, async (req: Request, res: Response) => {
-  console.log(`[PATCH /quizzes/${req.params.quizId}] Body:`, JSON.stringify(req.body, null, 2));
   try {
     const data = updateQuizSchema.parse(req.body);
 
@@ -184,13 +183,15 @@ router.patch('/:quizId', authMiddleware, async (req: Request, res: Response) => 
         select: { id: true },
       });
 
-      const newQuestionIds = data.questions.map((q: any) => q.id).filter(Boolean);
-      const questionsToDelete = currentQuestions.filter((q: any) => !newQuestionIds.includes(q.id));
+      const newQuestionIds = data.questions.map((q: { id: string }) => q.id).filter(Boolean);
+      const questionsToDelete = currentQuestions.filter(
+        (q: { id: string }) => !newQuestionIds.includes(q.id)
+      );
 
       // 2. Delete removed questions
       if (questionsToDelete.length > 0) {
         await prisma.question.deleteMany({
-          where: { id: { in: questionsToDelete.map((q: any) => q.id) } },
+          where: { id: { in: questionsToDelete.map((q: { id: string }) => q.id) } },
         });
       }
 
@@ -223,7 +224,7 @@ router.patch('/:quizId', authMiddleware, async (req: Request, res: Response) => 
 
         // Create new answers (we recreate them because answers don't hold meaningful historical cascade data in this context)
         await prisma.answer.createMany({
-          data: q.answers.map((a: any, index: number) => ({
+          data: q.answers.map((a: { text: string; isCorrect: boolean }, index: number) => ({
             questionId: questionId as string,
             position: index,
             text: a.text,

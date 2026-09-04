@@ -21,8 +21,8 @@ export function useSocket(config: SocketConfig, onEvent: () => void) {
   useEffect(() => {
     if (!config.sessionId || !config.role) return;
 
-    // Omit URL to connect to the current origin (which Vite will proxy)
-    const socket = io({
+    // Use explicit path and options to ensure connection works across devices
+    const socket = io(window.location.origin, {
       query: {
         sessionId: config.sessionId,
         role: config.role,

@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { Download } from "lucide-react";
 
 import { getSessionReport } from "@/lib/quiz.functions";
 import { Button } from "@/components/ui/button";
@@ -62,6 +63,26 @@ function ResultsPage() {
 
   const data = report.data!;
 
+  const exportToCSV = () => {
+    if (!data?.standings) return;
+
+    let csvContent = "Rank,Nickname,Score,Correct,Attempted\n";
+    data.standings.forEach((s) => {
+      // Escape commas in nickname if they exist
+      const safeName = s.nickname.replace(/,/g, "");
+      csvContent += `${s.rank},${safeName},${s.score},${s.correct},${s.answered}\n`;
+    });
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `quiz_results_pin_${data.pin}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <main className="min-h-screen bg-background px-6 py-10">
       <div className="mx-auto max-w-3xl">
@@ -76,9 +97,15 @@ function ResultsPage() {
               PIN {data.pin} · {new Date(data.createdAt).toLocaleString()}
             </p>
           </div>
-          <Badge variant={data.endedAt ? "secondary" : "default"}>
-            {data.endedAt ? "Finished" : data.status}
-          </Badge>
+          <div className="flex items-center gap-3">
+            <Button onClick={exportToCSV} variant="outline" size="sm">
+              <Download className="mr-2 h-4 w-4" />
+              Export CSV
+            </Button>
+            <Badge variant={data.endedAt ? "secondary" : "default"}>
+              {data.endedAt ? "Finished" : data.status}
+            </Badge>
+          </div>
         </div>
 
         <div className="mt-6 grid gap-4 sm:grid-cols-3">

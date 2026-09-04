@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { QRCodeSVG } from "qrcode.react";
+import confetti from "canvas-confetti";
 
 import { sessionAPI } from "@/lib/api-client";
 import { useSocket } from "@/hooks/useSocket";
@@ -41,7 +42,7 @@ function HostPage() {
   const state = useQuery({
     queryKey: ["game-state", sessionId],
     queryFn: () => sessionAPI.get(sessionId),
-    refetchInterval: 800,
+    refetchInterval: 400,
   });
 
   const refresh = useCallback(() => {
@@ -103,6 +104,36 @@ function HostPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data?.phase, autoAdvance]);
 
+  // Handle Confetti on finish
+  useEffect(() => {
+    if (data?.phase === "finished") {
+      const duration = 3000;
+      const end = Date.now() + duration;
+
+      const frame = () => {
+        confetti({
+          particleCount: 5,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0 },
+          colors: ["#facc15", "#60a5fa", "#f472b6"],
+        });
+        confetti({
+          particleCount: 5,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1 },
+          colors: ["#facc15", "#60a5fa", "#f472b6"],
+        });
+
+        if (Date.now() < end) {
+          requestAnimationFrame(frame);
+        }
+      };
+      frame();
+    }
+  }, [data?.phase]);
+
   if (state.isLoading || !data) {
     return (
       <main className="ink-surface min-h-screen p-10 text-ink-muted">
@@ -113,7 +144,9 @@ function HostPage() {
 
   const maxCount = Math.max(
     1,
-    ...(data.question?.answers.map((a: any) => a.count ?? 0) ?? [0]),
+    ...(data.question?.answers.map((a: { count?: number }) => a.count ?? 0) ?? [
+      0,
+    ]),
   );
 
   return (
@@ -161,8 +194,63 @@ function HostPage() {
           </section>
         ) : data.phase === "finished" ? (
           <section className="mt-10 rounded-2xl bg-white/5 p-10 text-center">
-            <h2 className="display-title text-2xl">Game over</h2>
-            <p className="mt-2 text-ink-muted">Final standings below.</p>
+            <h2 className="display-title text-4xl mb-4 text-yellow-400">
+              Game Over!
+            </h2>
+            {data.leaderboard.length > 0 ? (
+              <div className="mt-12 flex items-end justify-center gap-4 h-64 mb-8">
+                {/* 2nd Place */}
+                {data.leaderboard[1] && (
+                  <div className="w-1/4 flex flex-col items-center">
+                    <span className="font-bold mb-2 text-xl truncate w-full px-2">
+                      {data.leaderboard[1].avatar}{" "}
+                      {data.leaderboard[1].nickname}
+                    </span>
+                    <span className="font-bold text-ink-muted mb-2">
+                      {data.leaderboard[1].score} pts
+                    </span>
+                    <div className="w-full bg-zinc-300 h-32 rounded-t-2xl flex items-center justify-center text-4xl shadow-[0_-10px_20px_rgba(0,0,0,0.2)] border-t-4 border-white text-zinc-600 font-bold">
+                      2
+                    </div>
+                  </div>
+                )}
+                {/* 1st Place */}
+                {data.leaderboard[0] && (
+                  <div className="w-1/3 flex flex-col items-center z-10">
+                    <span className="font-bold mb-2 text-2xl text-yellow-400 truncate w-full px-2">
+                      {data.leaderboard[0].avatar}{" "}
+                      {data.leaderboard[0].nickname}
+                    </span>
+                    <span className="font-bold text-ink-muted mb-2">
+                      {data.leaderboard[0].score} pts
+                    </span>
+                    <div className="w-full bg-yellow-400 h-48 rounded-t-2xl flex items-center justify-center text-5xl text-yellow-700 shadow-[0_-15px_30px_rgba(250,204,21,0.2)] border-t-4 border-yellow-200 font-bold">
+                      1
+                    </div>
+                  </div>
+                )}
+                {/* 3rd Place */}
+                {data.leaderboard[2] && (
+                  <div className="w-1/4 flex flex-col items-center">
+                    <span className="font-bold mb-2 text-xl truncate w-full px-2">
+                      {data.leaderboard[2].avatar}{" "}
+                      {data.leaderboard[2].nickname}
+                    </span>
+                    <span className="font-bold text-ink-muted mb-2">
+                      {data.leaderboard[2].score} pts
+                    </span>
+                    <div className="w-full bg-orange-700 h-24 rounded-t-2xl flex items-center justify-center text-3xl shadow-[0_-10px_20px_rgba(0,0,0,0.2)] border-t-4 border-orange-500 text-orange-200 font-bold">
+                      3
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <p className="mt-2 text-ink-muted">No players joined.</p>
+            )}
+            <p className="mt-6 text-sm text-ink-muted uppercase tracking-widest font-semibold">
+              Scroll down for full standings
+            </p>
           </section>
         ) : data.question ? (
           <section className="mt-10 rounded-2xl bg-white/5 p-8">
@@ -179,33 +267,43 @@ function HostPage() {
             </p>
 
             <ul className="mt-6 grid gap-3 sm:grid-cols-2">
-              {data.question.answers.map((answer: any, i: number) => (
-                <li
-                  key={answer.id}
-                  className={`rounded-xl p-4 text-quiz-foreground ${optionStyle(i).bg} ${
-                    answer.isCorrect === false ? "opacity-40" : ""
-                  }`}
-                >
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="font-semibold">
-                      {optionStyle(i).shape} {answer.text}
-                    </span>
-                    {answer.count !== undefined ? (
-                      <span className="font-bold">{answer.count}</span>
-                    ) : null}
-                  </div>
-                  {answer.count !== undefined ? (
-                    <div className="mt-2 h-2 rounded-full bg-black/20">
-                      <div
-                        className="h-2 rounded-full bg-white/80"
-                        style={{
-                          width: `${Math.round((answer.count / maxCount) * 100)}%`,
-                        }}
-                      />
+              {data.question.answers.map(
+                (
+                  answer: {
+                    id: string;
+                    text: string;
+                    isCorrect?: boolean;
+                    count?: number;
+                  },
+                  i: number,
+                ) => (
+                  <li
+                    key={answer.id}
+                    className={`rounded-xl p-4 text-quiz-foreground ${optionStyle(i).bg} ${
+                      answer.isCorrect === false ? "opacity-40" : ""
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="font-semibold">
+                        {optionStyle(i).shape} {answer.text}
+                      </span>
+                      {answer.count !== undefined ? (
+                        <span className="font-bold">{answer.count}</span>
+                      ) : null}
                     </div>
-                  ) : null}
-                </li>
-              ))}
+                    {answer.count !== undefined ? (
+                      <div className="mt-2 h-2 rounded-full bg-black/20">
+                        <div
+                          className="h-2 rounded-full bg-white/80"
+                          style={{
+                            width: `${Math.round((answer.count / maxCount) * 100)}%`,
+                          }}
+                        />
+                      </div>
+                    ) : null}
+                  </li>
+                ),
+              )}
             </ul>
           </section>
         ) : null}
@@ -216,17 +314,27 @@ function HostPage() {
               Leaderboard
             </h2>
             <ol className="mt-3 space-y-2">
-              {data.leaderboard.slice(0, 10).map((p: any, i: number) => (
-                <li
-                  key={p.id}
-                  className="flex items-center justify-between rounded-xl bg-white/5 px-4 py-2"
-                >
-                  <span className="font-semibold">
-                    {i + 1}. {p.nickname}
-                  </span>
-                  <span className="font-bold">{p.score}</span>
-                </li>
-              ))}
+              {data.leaderboard.slice(0, 10).map(
+                (
+                  p: {
+                    id: string;
+                    nickname: string;
+                    score: number;
+                    avatar?: string;
+                  },
+                  i: number,
+                ) => (
+                  <li
+                    key={p.id}
+                    className="flex items-center justify-between rounded-xl bg-white/5 px-4 py-2"
+                  >
+                    <span className="font-semibold">
+                      {i + 1}. {p.avatar} {p.nickname}
+                    </span>
+                    <span className="font-bold">{p.score}</span>
+                  </li>
+                ),
+              )}
             </ol>
           </section>
         ) : null}

@@ -56,23 +56,25 @@ initializeSocket(io);
 export { io };
 
 // Error handling middleware
-app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
-  console.error(err);
-  res.status(500).json({ error: 'Internal server error' });
-});
+app.use(
+  (err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+    console.error(err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+);
 
 // Start server
 const PORT = process.env.PORT || 5000;
 httpServer.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-  console.log(`📊 Connecting to database...`);
+  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Connecting to database...`);
   prisma
     .$connect()
     .then(() => {
-      console.log('✅ Database connected');
+      console.log('Database connected');
     })
     .catch((error) => {
-      console.error('❌ Database connection failed:', error);
+      console.error('Database connection failed:', error);
       process.exit(1);
     });
 });

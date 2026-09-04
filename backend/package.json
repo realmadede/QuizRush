@@ -20,7 +20,7 @@
     "real-time",
     "game"
   ],
-  "author": "",
+  "author": "madede",
   "license": "MIT",
   "dependencies": {
     "@prisma/client": "^5.0.0",

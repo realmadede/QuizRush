@@ -95,17 +95,27 @@ function ProjectorPage() {
           {data.phase === "finished" ? "Final results" : "Leaderboard"}
         </h1>
         <ol className="mt-10 w-full max-w-2xl space-y-3">
-          {data.leaderboard.map((p: any, i: number) => (
-            <li
-              key={p.id}
-              className="flex justify-between rounded-2xl bg-white/10 px-6 py-4 text-2xl"
-            >
-              <span>
-                {i + 1}. {p.nickname}
-              </span>
-              <span className="font-bold">{p.score}</span>
-            </li>
-          ))}
+          {data.leaderboard.slice(0, 10).map(
+            (
+              p: {
+                id: string;
+                nickname: string;
+                score: number;
+                avatar?: string;
+              },
+              i: number,
+            ) => (
+              <li
+                key={p.id}
+                className="flex justify-between rounded-2xl bg-white/10 px-6 py-4 text-2xl"
+              >
+                <span>
+                  {i + 1}. {p.nickname}
+                </span>
+                <span className="font-bold">{p.score}</span>
+              </li>
+            ),
+          )}
         </ol>
       </main>
     );
@@ -138,20 +148,32 @@ function ProjectorPage() {
       </h1>
 
       <div className="mt-12 grid flex-1 grid-cols-1 gap-4 sm:grid-cols-2">
-        {question.answers.map((a: any, i: number) => (
-          <div
-            key={a.id}
-            className={`flex items-center justify-between rounded-3xl px-8 py-8 text-3xl font-bold text-quiz-foreground ${
-              optionStyle(i).bg
-            } ${revealed && !a.isCorrect ? "opacity-40" : ""}`}
-          >
-            <span>
-              <span className="mr-3">{optionStyle(i).shape}</span>
-              {a.text}
-            </span>
-            {revealed ? <span className="text-2xl">{a.count ?? 0}</span> : null}
-          </div>
-        ))}
+        {question.answers.map(
+          (
+            answer: {
+              id: string;
+              text: string;
+              isCorrect?: boolean;
+              count?: number;
+            },
+            i: number,
+          ) => (
+            <div
+              key={answer.id}
+              className={`flex items-center justify-between rounded-3xl px-8 py-8 text-3xl font-bold text-quiz-foreground ${
+                optionStyle(i).bg
+              } ${revealed && !answer.isCorrect ? "opacity-40" : ""}`}
+            >
+              <span>
+                <span className="mr-3">{optionStyle(i).shape}</span>
+                {answer.text}
+              </span>
+              {revealed ? (
+                <span className="text-2xl">{answer.count ?? 0}</span>
+              ) : null}
+            </div>
+          ),
+        )}
       </div>
 
       <p className="mt-8 text-center text-xl text-ink-muted">
