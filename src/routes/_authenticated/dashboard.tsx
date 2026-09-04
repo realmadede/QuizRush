@@ -4,11 +4,18 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { useAuth, signOut } from "@/hooks/useAuth";
-import { quizAPI, sessionAPI } from "@/lib/api-client";
+import { authAPI, quizAPI, sessionAPI } from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
@@ -72,6 +79,31 @@ function Dashboard() {
       toast.error(error.message || "Could not start a live game."),
   });
 
+  const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
+  const [editFullName, setEditFullName] = useState(user?.fullName || "");
+  const [editEmail, setEditEmail] = useState(user?.email || "");
+
+  const updateProfileMutation = useMutation({
+    mutationFn: () =>
+      authAPI.updateProfile({ fullName: editFullName, email: editEmail }),
+    onSuccess: (updatedUser) => {
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+      setIsEditProfileOpen(false);
+
+      if (updatedUser.emailVerificationSent) {
+        toast.success(
+          "Profile saved! Check your new email inbox to verify the change.",
+        );
+      } else {
+        toast.success("Profile updated successfully.");
+      }
+
+      window.location.reload();
+    },
+    onError: (error: Error) =>
+      toast.error(error.message || "Could not update profile."),
+  });
+
   async function handleSignOut() {
     await queryClient.cancelQueries();
     queryClient.clear();
@@ -84,10 +116,72 @@ function Dashboard() {
       <div className="mx-auto max-w-5xl">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h1 className="display-title text-3xl">Teacher dashboard</h1>
-            <p className="mt-1 text-sm text-muted-foreground">{user?.email}</p>
+            <h1 className="display-title text-3xl">
+              Welcome, {user?.fullName || "Teacher"}!
+            </h1>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Dashboard for {user?.email}
+            </p>
           </div>
           <div className="flex gap-2">
+            <Dialog
+              open={isEditProfileOpen}
+              onOpenChange={setIsEditProfileOpen}
+            >
+              <DialogTrigger asChild>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setEditFullName(user?.fullName || "");
+                    setEditEmail(user?.email || "");
+                  }}
+                >
+                  Edit Profile
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Edit Profile</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="fullName">Full Name</Label>
+                    <Input
+                      id="fullName"
+                      value={editFullName}
+                      onChange={(e) => setEditFullName(e.target.value)}
+                      placeholder="Your name"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={editEmail}
+                      onChange={(e) => setEditEmail(e.target.value)}
+                      placeholder="your.email@example.com"
+                    />
+                  </div>
+                </div>
+                <div className="flex justify-end gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsEditProfileOpen(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={() => updateProfileMutation.mutate()}
+                    disabled={updateProfileMutation.isPending}
+                  >
+                    {updateProfileMutation.isPending
+                      ? "Saving..."
+                      : "Save changes"}
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
             <Button asChild variant="ghost">
               <Link to="/">Join screen</Link>
             </Button>

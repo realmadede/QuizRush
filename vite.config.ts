@@ -7,7 +7,7 @@ import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 export default defineConfig({
   plugins: [
     tanstackStart({
-      server: { entry: "server" }
+      server: { entry: "server" },
     }),
     react(),
     tailwindcss(),
@@ -16,14 +16,14 @@ export default defineConfig({
   server: {
     host: true,
     proxy: {
-      '/api': {
-        target: 'http://localhost:5000',
+      "/api": {
+        target: "http://localhost:5000",
         changeOrigin: true,
       },
-      '/socket.io': {
-        target: 'http://localhost:5000',
+      "/socket.io": {
+        target: "http://localhost:5000",
         ws: true,
-      }
-    }
-  }
+      },
+    },
+  },
 });

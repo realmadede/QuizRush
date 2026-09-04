@@ -11,9 +11,11 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/")({
-  validateSearch: (search: Record<string, unknown>): { pin?: string | undefined } => {
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): { pin?: string | undefined } => {
     return {
-      pin: search['pin'] as string | undefined,
+      pin: search["pin"] as string | undefined,
     };
   },
   head: () => ({

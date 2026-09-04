@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { prisma } from '../index';
 import { generateToken } from '../utils/jwt';
 import { authMiddleware } from '../middleware/auth';
-import { sendPasswordResetEmail } from '../utils/mailer';
+import { sendPasswordResetEmail, sendEmailVerification } from '../utils/mailer';
 
 const router = Router();
 
@@ -144,6 +144,102 @@ router.get('/me', authMiddleware, async (req: Request, res: Response) => {
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: 'Failed to get user' });
+  }
+});
+
+const updateProfileSchema = z.object({
+  fullName: z.string().optional(),
+  email: z.string().email().optional(),
+});
+
+// Update current user
+router.put('/me', authMiddleware, async (req: Request, res: Response) => {
+  try {
+    const data = updateProfileSchema.parse(req.body);
+    const currentUser = await prisma.profile.findUnique({ where: { id: req.user!.userId } });
+
+    if (!currentUser) return res.status(404).json({ error: 'User not found' });
+
+    const updateData: any = {};
+    if (data.fullName !== undefined) updateData.fullName = data.fullName;
+
+    let emailVerificationSent = false;
+
+    // If the email is changing, we don't update it directly. Instead, set pendingEmail and send verification.
+    if (data.email && data.email !== currentUser.email) {
+      // Check if new email is already in use
+      const existing = await prisma.profile.findUnique({ where: { email: data.email } });
+      if (existing) {
+        return res.status(409).json({ error: 'Email already in use' });
+      }
+
+      const emailVerificationToken = crypto.randomBytes(32).toString('hex');
+      updateData.pendingEmail = data.email;
+      updateData.emailVerificationToken = emailVerificationToken;
+
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+      const verifyLink = `${frontendUrl}/verify-email?token=${emailVerificationToken}`;
+      await sendEmailVerification(data.email, verifyLink);
+      emailVerificationSent = true;
+    }
+
+    const user = await prisma.profile.update({
+      where: { id: req.user!.userId },
+      data: updateData,
+    });
+
+    return res.json({
+      id: user.id,
+      email: user.email,
+      fullName: user.fullName,
+      emailVerificationSent,
+    });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({ error: error.errors });
+    }
+    console.error(error);
+    return res.status(500).json({ error: 'Failed to update user profile' });
+  }
+});
+
+const verifyEmailSchema = z.object({
+  token: z.string(),
+});
+
+// Verify email
+router.post('/verify-email', async (req: Request, res: Response) => {
+  try {
+    const data = verifyEmailSchema.parse(req.body);
+
+    const user = await prisma.profile.findFirst({
+      where: { emailVerificationToken: data.token },
+    });
+
+    if (!user || !user.pendingEmail) {
+      return res.status(400).json({ error: 'Invalid or expired verification link' });
+    }
+
+    // Double check if pending email is still available (someone else could have registered it)
+    const existing = await prisma.profile.findUnique({ where: { email: user.pendingEmail } });
+    if (existing) {
+      return res.status(409).json({ error: 'Email has already been taken by another user' });
+    }
+
+    await prisma.profile.update({
+      where: { id: user.id },
+      data: {
+        email: user.pendingEmail,
+        pendingEmail: null,
+        emailVerificationToken: null,
+      },
+    });
+
+    return res.json({ ok: true });
+  } catch (error) {
+    if (error instanceof z.ZodError) return res.status(400).json({ error: error.errors });
+    console.error(error);
+    return res.status(500).json({ error: 'Failed to verify email' });
   }
 });
 

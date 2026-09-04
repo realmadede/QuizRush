@@ -35,7 +35,11 @@ function ForgotPasswordPage() {
         <Link to="/" className="display-title text-xl">
           QuizArena
         </Link>
-        <Button asChild variant="ghost" className="text-ink-foreground hover:bg-white/10">
+        <Button
+          asChild
+          variant="ghost"
+          className="text-ink-foreground hover:bg-white/10"
+        >
           <Link to="/auth">Sign in instead</Link>
         </Button>
       </header>
@@ -43,20 +47,26 @@ function ForgotPasswordPage() {
       <div className="flex flex-1 items-center justify-center px-4 pb-16">
         <div className="w-full max-w-md animate-pop-in rounded-3xl bg-card p-8 text-card-foreground shadow-pop">
           <h1 className="display-title text-center text-2xl">Reset Password</h1>
-          
+
           {sent ? (
             <div className="mt-6 text-center space-y-4">
               <p className="text-muted-foreground">
-                We have sent a password reset link to <strong>{email}</strong>. Please check your inbox and spam folder.
+                We have sent a password reset link to <strong>{email}</strong>.
+                Please check your inbox and spam folder.
               </p>
-              <Button onClick={() => setSent(false)} variant="outline" className="w-full">
+              <Button
+                onClick={() => setSent(false)}
+                variant="outline"
+                className="w-full"
+              >
                 Try a different email
               </Button>
             </div>
           ) : (
             <>
               <p className="mt-2 text-center text-sm text-muted-foreground">
-                Enter your email address and we will send you a link to reset your password.
+                Enter your email address and we will send you a link to reset
+                your password.
               </p>
 
               <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
@@ -71,8 +81,12 @@ function ForgotPasswordPage() {
                     onChange={(e) => setEmail(e.target.value)}
                   />
                 </div>
-                
-                <Button type="submit" className="w-full" disabled={busy || !email}>
+
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={busy || !email}
+                >
                   {busy ? "Sending..." : "Send reset link"}
                 </Button>
               </form>

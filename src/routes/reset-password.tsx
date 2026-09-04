@@ -8,9 +8,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export const Route = createFileRoute("/reset-password")({
-  validateSearch: (search: Record<string, unknown>): { token?: string | undefined } => {
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): { token?: string | undefined } => {
     return {
-      token: search['token'] as string | undefined,
+      token: search["token"] as string | undefined,
     };
   },
   component: ResetPasswordPage,
@@ -27,7 +29,9 @@ function ResetPasswordPage() {
     return (
       <main className="ink-surface flex min-h-screen flex-col items-center justify-center p-6 text-center">
         <h1 className="display-title text-3xl">Invalid link</h1>
-        <p className="mt-4 text-ink-muted">The password reset link is missing or invalid.</p>
+        <p className="mt-4 text-ink-muted">
+          The password reset link is missing or invalid.
+        </p>
         <Button asChild className="mt-8">
           <Link to="/forgot-password">Request a new link</Link>
         </Button>
@@ -47,7 +51,9 @@ function ResetPasswordPage() {
       toast.success("Password updated successfully! Please sign in.");
       navigate({ to: "/auth", replace: true });
     } catch (error: any) {
-      toast.error(error.message || "Failed to reset password. The link may have expired.");
+      toast.error(
+        error.message || "Failed to reset password. The link may have expired.",
+      );
     } finally {
       setBusy(false);
     }
@@ -63,7 +69,9 @@ function ResetPasswordPage() {
 
       <div className="flex flex-1 items-center justify-center px-4 pb-16">
         <div className="w-full max-w-md animate-pop-in rounded-3xl bg-card p-8 text-card-foreground shadow-pop">
-          <h1 className="display-title text-center text-2xl">Create New Password</h1>
+          <h1 className="display-title text-center text-2xl">
+            Create New Password
+          </h1>
           <p className="mt-2 text-center text-sm text-muted-foreground">
             Please enter your new password below.
           </p>
@@ -87,13 +95,23 @@ function ResetPasswordPage() {
                   onClick={() => setShowPassword(!showPassword)}
                   tabIndex={-1}
                 >
-                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
                 </button>
               </div>
-              <p className="text-xs text-muted-foreground mt-1">Must be at least 8 characters.</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                Must be at least 8 characters.
+              </p>
             </div>
-            
-            <Button type="submit" className="w-full" disabled={busy || password.length < 8}>
+
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={busy || password.length < 8}
+            >
               {busy ? "Saving..." : "Save Password"}
             </Button>
           </form>

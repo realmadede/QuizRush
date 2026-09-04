@@ -158,8 +158,8 @@ router.get('/:sessionId', optionalAuthMiddleware, async (req: Request, res: Resp
         },
         players: {
           include: {
-            answers: true
-          }
+            answers: true,
+          },
         },
       },
     });
@@ -171,13 +171,17 @@ router.get('/:sessionId', optionalAuthMiddleware, async (req: Request, res: Resp
     const currentQuestion = session.quiz.questions[session.currentQuestionIndex];
     let questionEndsAt = null;
     if (session.questionStartedAt && currentQuestion) {
-      questionEndsAt = new Date(session.questionStartedAt.getTime() + currentQuestion.timeLimitSeconds * 1000).toISOString();
+      questionEndsAt = new Date(
+        session.questionStartedAt.getTime() + currentQuestion.timeLimitSeconds * 1000
+      ).toISOString();
     }
-    
+
     // answersReceived is the count of players who have answered the current question
     let answersReceived = 0;
     if (currentQuestion) {
-      answersReceived = session.players.filter(p => p.answers.some(a => a.questionId === currentQuestion.id)).length;
+      answersReceived = session.players.filter((p) =>
+        p.answers.some((a) => a.questionId === currentQuestion.id)
+      ).length;
     }
 
     return res.json({
@@ -188,22 +192,36 @@ router.get('/:sessionId', optionalAuthMiddleware, async (req: Request, res: Resp
       quiz: {
         id: session.quiz.id,
         title: session.quiz.title,
-        questions: session.quiz.questions.map((q) => ({
-          id: q.id,
-          text: q.text,
-          position: q.position,
-          timeLimit: q.timeLimitSeconds,
-          points: q.points,
-          answers: q.answers.map((a) => ({
-            id: a.id,
-            text: a.text,
-            isCorrect: a.isCorrect,
-          })),
-        })),
+        questions: session.quiz.questions.map((q) => {
+          const qAnswers = session.players
+            .flatMap((p) => p.answers)
+            .filter((a) => a.questionId === q.id);
+          const attempted = qAnswers.length;
+          const correct = qAnswers.filter((a) => a.isCorrect).length;
+          const wrong = attempted - correct;
+
+          return {
+            id: q.id,
+            text: q.text,
+            position: q.position,
+            timeLimit: q.timeLimitSeconds,
+            points: q.points,
+            stats: { attempted, correct, wrong },
+            answers: q.answers.map((a) => {
+              const count = qAnswers.filter((pa) => pa.answerId === a.id).length;
+              return {
+                id: a.id,
+                text: a.text,
+                isCorrect: a.isCorrect,
+                count,
+              };
+            }),
+          };
+        }),
       },
       players: session.players.map((p) => {
         const answered = p.answers.length;
-        const correct = p.answers.filter(a => a.isCorrect).length;
+        const correct = p.answers.filter((a) => a.isCorrect).length;
         return {
           id: p.id,
           nickname: p.nickname,

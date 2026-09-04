@@ -4,6 +4,14 @@ import { useQuery } from "@tanstack/react-query";
 import { getSessionReport } from "@/lib/quiz.functions";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+} from "recharts";
 
 export const Route = createFileRoute("/_authenticated/results/$sessionId")({
   head: () => ({
@@ -105,6 +113,73 @@ function ResultsPage() {
           <p className="mt-8 text-sm text-muted-foreground">
             No players took part in this session.
           </p>
+        )}
+
+        {data.questions && data.questions.length > 0 && (
+          <div className="mt-10 space-y-6">
+            <h2 className="display-title text-2xl">Question Breakdown</h2>
+            <div className="grid gap-6 sm:grid-cols-2">
+              {data.questions.map((q, i) => {
+                const pieData = [
+                  {
+                    name: "Right",
+                    value: q.stats?.correct || 0,
+                    color: "#10b981",
+                  }, // green-500
+                  {
+                    name: "Wrong",
+                    value: q.stats?.wrong || 0,
+                    color: "#ef4444",
+                  }, // red-500
+                ];
+
+                return (
+                  <div
+                    key={q.id}
+                    className="rounded-2xl border bg-card p-5 shadow-card flex flex-col"
+                  >
+                    <h3 className="font-semibold line-clamp-2 mb-1">
+                      {i + 1}. {q.text}
+                    </h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      {q.stats?.attempted} attempted
+                    </p>
+
+                    {q.stats?.attempted ? (
+                      <div className="h-48 w-full mt-auto">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <PieChart>
+                            <Pie
+                              data={pieData}
+                              cx="50%"
+                              cy="50%"
+                              innerRadius={40}
+                              outerRadius={70}
+                              paddingAngle={2}
+                              dataKey="value"
+                            >
+                              {pieData.map((entry, index) => (
+                                <Cell
+                                  key={`cell-${index}`}
+                                  fill={entry.color}
+                                />
+                              ))}
+                            </Pie>
+                            <Tooltip />
+                            <Legend />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      </div>
+                    ) : (
+                      <div className="h-48 w-full flex items-center justify-center text-sm text-muted-foreground bg-muted/20 rounded-xl mt-auto">
+                        No answers
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         )}
       </div>
     </main>

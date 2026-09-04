@@ -87,7 +87,7 @@ export const getSessionReport = async (sessionId: string) => {
   const standings = session.leaderboard.map((p, i) => {
     totalCorrect += p.correct;
     totalAnswers += p.answered;
-    
+
     return {
       id: p.id,
       nickname: p.nickname,
@@ -97,8 +97,9 @@ export const getSessionReport = async (sessionId: string) => {
       answered: p.answered,
     };
   });
-  
-  const accuracy = totalAnswers > 0 ? Math.round((totalCorrect / totalAnswers) * 100) : 0;
+
+  const accuracy =
+    totalAnswers > 0 ? Math.round((totalCorrect / totalAnswers) * 100) : 0;
 
   return {
     id: session.id,
@@ -110,5 +111,6 @@ export const getSessionReport = async (sessionId: string) => {
     accuracy,
     answersCount: totalAnswers,
     standings,
+    questions: session.quiz.questions,
   };
 };

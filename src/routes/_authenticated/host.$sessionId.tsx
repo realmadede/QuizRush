@@ -9,6 +9,8 @@ import { useSocket } from "@/hooks/useSocket";
 import { useAuth } from "@/hooks/useAuth";
 import { optionStyle, useCountdownLabel } from "@/lib/quiz-ui";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 export const Route = createFileRoute("/_authenticated/host/$sessionId")({
   head: () => ({
@@ -39,14 +41,17 @@ function HostPage() {
   const state = useQuery({
     queryKey: ["game-state", sessionId],
     queryFn: () => sessionAPI.get(sessionId),
-    refetchInterval: 1500,
+    refetchInterval: 800,
   });
 
   const refresh = useCallback(() => {
     void state.refetch();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionId]);
-  useSocket({ sessionId, role: "host", userId: user?.id || undefined }, refresh);
+  useSocket(
+    { sessionId, role: "host", userId: user?.id || undefined },
+    refresh,
+  );
 
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
@@ -64,11 +69,39 @@ function HostPage() {
   const data = state.data;
   const seconds = useCountdownLabel(data?.endsAt, now);
 
+  const [autoAdvance, setAutoAdvance] = useState(false);
+
   useEffect(() => {
-    if (data?.phase === "question" && seconds === 0 && !actionMutation.isPending) {
+    if (
+      data?.phase === "question" &&
+      seconds === 0 &&
+      !actionMutation.isPending
+    ) {
       actionMutation.mutate("end_question");
     }
   }, [data?.phase, seconds, actionMutation]);
+
+  // Handle auto-advance
+  useEffect(() => {
+    if (!autoAdvance) return;
+
+    let timer: ReturnType<typeof setTimeout> | undefined;
+
+    if (data?.phase === "results") {
+      timer = setTimeout(() => {
+        actionMutation.mutate("show_leaderboard");
+      }, 4000); // 4 seconds on results
+    } else if (data?.phase === "leaderboard") {
+      timer = setTimeout(() => {
+        actionMutation.mutate("next_question");
+      }, 5000); // 5 seconds on leaderboard
+    }
+
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data?.phase, autoAdvance]);
 
   if (state.isLoading || !data) {
     return (
@@ -118,7 +151,12 @@ function HostPage() {
               />
             </div>
             <p className="mt-2 text-ink-muted">
-              Scan the QR code or go to <span className="font-bold text-ink-foreground">{window.location.origin}</span> and enter PIN <span className="font-bold text-ink-foreground">{data.pin}</span>
+              Scan the QR code or go to{" "}
+              <span className="font-bold text-ink-foreground">
+                {window.location.origin}
+              </span>{" "}
+              and enter PIN{" "}
+              <span className="font-bold text-ink-foreground">{data.pin}</span>
             </p>
           </section>
         ) : data.phase === "finished" ? (
@@ -193,7 +231,22 @@ function HostPage() {
           </section>
         ) : null}
 
-        <div className="sticky bottom-4 mt-10 flex flex-wrap gap-2 rounded-2xl bg-white/10 p-3 backdrop-blur">
+        <div className="sticky bottom-4 mt-10 flex flex-wrap gap-2 rounded-2xl bg-white/10 p-3 backdrop-blur items-center">
+          {data.phase !== "lobby" && data.phase !== "finished" ? (
+            <div className="flex items-center space-x-2 mr-2 bg-white/5 px-3 py-1.5 rounded-xl border border-white/10">
+              <Switch
+                id="auto-advance"
+                checked={autoAdvance}
+                onCheckedChange={setAutoAdvance}
+              />
+              <Label
+                htmlFor="auto-advance"
+                className="text-white text-xs uppercase tracking-wider font-semibold cursor-pointer"
+              >
+                Auto-Advance
+              </Label>
+            </div>
+          ) : null}
           {data.phase === "lobby" ? (
             <Button
               disabled={actionMutation.isPending || data.playerCount === 0}

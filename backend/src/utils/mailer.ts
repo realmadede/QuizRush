@@ -33,3 +33,28 @@ export const sendPasswordResetEmail = async (to: string, resetLink: string) => {
 
   await transporter.sendMail(mailOptions);
 };
+
+export const sendEmailVerification = async (to: string, verifyLink: string) => {
+  if (!process.env.SMTP_EMAIL || !process.env.SMTP_PASSWORD) {
+    console.log('\n======================================================');
+    console.log(`[TESTING MODE] Email Verification requested for: ${to}`);
+    console.log(`Verify Link: ${verifyLink}`);
+    console.log('To send real emails, add SMTP_EMAIL and SMTP_PASSWORD to your backend/.env');
+    console.log('======================================================\n');
+    return;
+  }
+
+  const mailOptions = {
+    from: `"QuizArena" <${process.env.SMTP_EMAIL}>`,
+    to,
+    subject: 'Verify your new email address',
+    html: `
+      <h2>QuizArena Email Verification</h2>
+      <p>You requested to change your email address to this one. Click the link below to verify and complete the change:</p>
+      <a href="${verifyLink}" style="display:inline-block;padding:10px 20px;background-color:#28a745;color:#fff;text-decoration:none;border-radius:5px;">Verify Email</a>
+      <p>If you did not request this change, please ignore this email.</p>
+    `,
+  };
+
+  await transporter.sendMail(mailOptions);
+};

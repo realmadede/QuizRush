@@ -67,13 +67,13 @@ router.post('/state', async (req: Request, res: Response) => {
       where: { sessionId: session.id },
       orderBy: { score: 'desc' },
     });
-    const leaderboard = allPlayers.map(p => ({
+    const leaderboard = allPlayers.map((p) => ({
       id: p.id,
       nickname: p.nickname,
-      score: p.score
+      score: p.score,
     }));
-    
-    const rank = allPlayers.findIndex(p => p.id === player.id) + 1;
+
+    const rank = allPlayers.findIndex((p) => p.id === player.id) + 1;
 
     // Check if player has answered the current question
     let myAnswer = null;
@@ -82,16 +82,18 @@ router.post('/state', async (req: Request, res: Response) => {
         where: {
           playerId_questionId: {
             playerId: player.id,
-            questionId: currentQuestion.id
-          }
-        }
+            questionId: currentQuestion.id,
+          },
+        },
       });
     }
 
     // Calculate question ends at if not present
     let questionEndsAt = session.questionEndsAt;
     if (!questionEndsAt && session.questionStartedAt && currentQuestion) {
-      questionEndsAt = new Date(session.questionStartedAt.getTime() + currentQuestion.timeLimitSeconds * 1000);
+      questionEndsAt = new Date(
+        session.questionStartedAt.getTime() + currentQuestion.timeLimitSeconds * 1000
+      );
     }
 
     return res.json({
@@ -114,11 +116,13 @@ router.post('/state', async (req: Request, res: Response) => {
         : null,
       questionStartedAt: session.questionStartedAt?.toISOString(),
       questionEndsAt: questionEndsAt?.toISOString(),
-      myAnswer: myAnswer ? { 
-        answerId: myAnswer.answerId,
-        isCorrect: myAnswer.isCorrect,
-        points: myAnswer.pointsAwarded
-      } : null,
+      myAnswer: myAnswer
+        ? {
+            answerId: myAnswer.answerId,
+            isCorrect: myAnswer.isCorrect,
+            points: myAnswer.pointsAwarded,
+          }
+        : null,
       questionIndex: session.currentQuestionIndex,
       totalQuestions: questions.length,
       player: {

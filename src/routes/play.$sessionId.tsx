@@ -3,7 +3,12 @@ import { useCallback, useEffect, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-import { clearPlayer, loadPlayer, savePlayer, type PlayerCredentials } from "@/lib/player-session";
+import {
+  clearPlayer,
+  loadPlayer,
+  savePlayer,
+  type PlayerCredentials,
+} from "@/lib/player-session";
 import { playerAPI, sessionAPI } from "@/lib/api-client";
 import { useSocket } from "@/hooks/useSocket";
 import { optionStyle, useCountdownLabel } from "@/lib/quiz-ui";
@@ -50,7 +55,7 @@ function PlayPage() {
   const state = useQuery({
     queryKey: ["player-state", player?.playerId],
     enabled: !!player,
-    refetchInterval: 1500,
+    refetchInterval: 800,
     queryFn: () => playerAPI.getState(player!.playerId, player!.token),
   });
 

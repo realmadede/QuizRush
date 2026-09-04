@@ -181,16 +181,16 @@ router.patch('/:quizId', authMiddleware, async (req: Request, res: Response) => 
       // 1. Get all current questions to find ones to delete
       const currentQuestions = await prisma.question.findMany({
         where: { quizId: req.params.quizId },
-        select: { id: true }
+        select: { id: true },
       });
-      
+
       const newQuestionIds = data.questions.map((q: any) => q.id).filter(Boolean);
       const questionsToDelete = currentQuestions.filter((q: any) => !newQuestionIds.includes(q.id));
 
       // 2. Delete removed questions
       if (questionsToDelete.length > 0) {
         await prisma.question.deleteMany({
-          where: { id: { in: questionsToDelete.map((q: any) => q.id) } }
+          where: { id: { in: questionsToDelete.map((q: any) => q.id) } },
         });
       }
 
@@ -205,7 +205,7 @@ router.patch('/:quizId', authMiddleware, async (req: Request, res: Response) => 
         };
 
         let questionId = q.id;
-        
+
         if (!questionId || questionId.startsWith('new-')) {
           const createdQ = await prisma.question.create({ data: questionData });
           questionId = createdQ.id;
@@ -218,7 +218,7 @@ router.patch('/:quizId', authMiddleware, async (req: Request, res: Response) => 
 
         // Delete existing answers for this question
         await prisma.answer.deleteMany({
-          where: { questionId }
+          where: { questionId },
         });
 
         // Create new answers (we recreate them because answers don't hold meaningful historical cascade data in this context)

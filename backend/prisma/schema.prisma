@@ -30,6 +30,8 @@ model Profile {
   password            String // Hashed password
   resetToken          String?
   resetTokenExpiresAt DateTime?
+  pendingEmail        String?
+  emailVerificationToken String?
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 

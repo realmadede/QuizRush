@@ -23,7 +23,7 @@ async function request<T>(
 
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
-    ...(options.headers as Record<string, string> || {}),
+    ...((options.headers as Record<string, string>) || {}),
   };
 
   if (token) {
@@ -84,6 +84,23 @@ export const authAPI = {
       method: "POST",
       body: JSON.stringify({ token, password }),
     }),
+
+  updateProfile: (data: { fullName?: string; email?: string }) =>
+    request<{
+      id: string;
+      email: string;
+      fullName?: string;
+      emailVerificationSent?: boolean;
+    }>("/auth/me", {
+      method: "PUT",
+      body: JSON.stringify(data),
+    }),
+
+  verifyEmail: (token: string) =>
+    request<{ ok: boolean }>("/auth/verify-email", {
+      method: "POST",
+      body: JSON.stringify({ token }),
+    }),
 };
 
 // Quiz endpoints
@@ -128,22 +145,24 @@ export const quizAPI = {
 
   update: (
     quizId: string,
-    data: { 
-      title?: string | undefined; 
-      description?: string | undefined; 
+    data: {
+      title?: string | undefined;
+      description?: string | undefined;
       isPublished?: boolean | undefined;
-      questions?: Array<{
-        id?: string;
-        position: number;
-        text: string;
-        timeLimit: number;
-        points: number;
-        answers: Array<{
-          id?: string;
-          text: string;
-          isCorrect: boolean;
-        }>;
-      }> | undefined;
+      questions?:
+        | Array<{
+            id?: string;
+            position: number;
+            text: string;
+            timeLimit: number;
+            points: number;
+            answers: Array<{
+              id?: string;
+              text: string;
+              isCorrect: boolean;
+            }>;
+          }>
+        | undefined;
     },
   ) =>
     request<{ id: string }>(`/quizzes/${quizId}`, {
@@ -193,10 +212,12 @@ export const sessionAPI = {
           position: number;
           timeLimit: number;
           points: number;
+          stats?: { attempted: number; correct: number; wrong: number };
           answers: Array<{
             id: string;
             text: string;
             isCorrect: boolean;
+            count?: number;
           }>;
         }>;
       };
@@ -255,7 +276,11 @@ export const playerAPI = {
       };
       questionStartedAt?: string;
       questionEndsAt?: string;
-      myAnswer?: { answerId: string; isCorrect: boolean; points: number } | null;
+      myAnswer?: {
+        answerId: string;
+        isCorrect: boolean;
+        points: number;
+      } | null;
       questionIndex: number;
       totalQuestions: number;
       player: {

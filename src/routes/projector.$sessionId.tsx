@@ -68,11 +68,16 @@ function ProjectorPage() {
           />
         </div>
         <p className="text-3xl uppercase tracking-[0.2em] text-ink-muted">
-          Join at <span className="font-bold text-ink-foreground">{window.location.host}</span>
+          Join at{" "}
+          <span className="font-bold text-ink-foreground">
+            {window.location.host}
+          </span>
         </p>
         <div className="mt-8 flex items-center justify-center gap-6">
           <p className="text-4xl text-ink-muted">PIN</p>
-          <h1 className="display-title text-7xl sm:text-9xl tracking-[0.2em]">{data.pin}</h1>
+          <h1 className="display-title text-7xl sm:text-9xl tracking-[0.2em]">
+            {data.pin}
+          </h1>
         </div>
         <p className="mt-8 text-2xl">{data.quizTitle}</p>
         <span className="mt-10 animate-pulse-ring rounded-full bg-white/10 px-8 py-3 text-xl">
