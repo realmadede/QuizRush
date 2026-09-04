@@ -148,6 +148,7 @@
     opacity: 0;
     transform: scale(0.94) translateY(8px);
   }
+
   to {
     opacity: 1;
     transform: scale(1) translateY(0);
@@ -155,11 +156,13 @@
 }
 
 @keyframes pulse-ring {
+
   0%,
   100% {
     opacity: 1;
     transform: scale(1);
   }
+
   50% {
     opacity: 0.75;
     transform: scale(1.03);
@@ -168,16 +171,12 @@
 
 @utility ink-surface {
   background:
-    radial-gradient(
-      120% 90% at 12% 0%,
+    radial-gradient(120% 90% at 12% 0%,
       oklch(0.34 0.09 250 / 0.75),
-      transparent 60%
-    ),
-    radial-gradient(
-      90% 80% at 92% 100%,
+      transparent 60%),
+    radial-gradient(90% 80% at 92% 100%,
       oklch(0.4 0.12 30 / 0.4),
-      transparent 62%
-    ),
+      transparent 62%),
     var(--ink);
   color: var(--ink-foreground);
 }
