@@ -12,13 +12,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Teacher Sign In — QuizArena" },
+      { title: "Teacher Sign In — QuizSpark" },
       {
         name: "description",
         content:
-          "Sign in or create a QuizArena teacher account to build quizzes and host live real-time sessions for your class.",
+          "Sign in or create a QuizSpark teacher account to build quizzes and host live real-time sessions for your class.",
       },
-      { property: "og:title", content: "Teacher Sign In — QuizArena" },
+      { property: "og:title", content: "Teacher Sign In — QuizSpark" },
       {
         property: "og:description",
         content:
@@ -76,7 +76,7 @@ function AuthPage() {
     <main className="ink-surface flex min-h-screen flex-col">
       <header className="flex items-center justify-between px-6 py-5">
         <Link to="/" className="display-title text-xl">
-          QuizArena
+          QuizSpark
         </Link>
         <Button
           asChild

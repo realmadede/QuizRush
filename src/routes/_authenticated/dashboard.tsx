@@ -20,13 +20,13 @@ import { Label } from "@/components/ui/label";
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
-      { title: "Teacher Dashboard — QuizArena" },
+      { title: "Teacher Dashboard — QuizSpark" },
       {
         name: "description",
         content:
-          "Manage your quizzes, review past sessions and launch live QuizArena games for your students.",
+          "Manage your quizzes, review past sessions and launch live QuizSpark games for your students.",
       },
-      { property: "og:title", content: "Teacher Dashboard — QuizArena" },
+      { property: "og:title", content: "Teacher Dashboard — QuizSpark" },
       {
         property: "og:description",
         content: "Manage quizzes, review results and launch live sessions.",

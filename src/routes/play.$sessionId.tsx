@@ -19,13 +19,13 @@ export const Route = createFileRoute("/play/$sessionId")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Playing a Live Quiz — QuizArena" },
+      { title: "Playing a Live Quiz — QuizSpark" },
       {
         name: "description",
         content:
-          "You are in a live QuizArena session. Answer each question as fast as you can.",
+          "You are in a live QuizSpark session. Answer each question as fast as you can.",
       },
-      { property: "og:title", content: "Playing a Live Quiz — QuizArena" },
+      { property: "og:title", content: "Playing a Live Quiz — QuizSpark" },
       {
         property: "og:description",
         content: "Answer live quiz questions in real time.",

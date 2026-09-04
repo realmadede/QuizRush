@@ -15,13 +15,13 @@ import { Switch } from "@/components/ui/switch";
 export const Route = createFileRoute("/_authenticated/quizzes/$quizId")({
   head: () => ({
     meta: [
-      { title: "Quiz Editor — QuizArena" },
+      { title: "Quiz Editor — QuizSpark" },
       {
         name: "description",
         content:
-          "Write questions, set timers and points, and mark correct answers for your live QuizArena game.",
+          "Write questions, set timers and points, and mark correct answers for your live QuizSpark game.",
       },
-      { property: "og:title", content: "Quiz Editor — QuizArena" },
+      { property: "og:title", content: "Quiz Editor — QuizSpark" },
       {
         property: "og:description",
         content: "Build questions, timers and answers for your live quiz.",

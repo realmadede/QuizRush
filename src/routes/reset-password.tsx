@@ -64,7 +64,7 @@ function ResetPasswordPage() {
     <main className="ink-surface flex min-h-screen flex-col">
       <header className="flex items-center justify-between px-6 py-5">
         <Link to="/" className="display-title text-xl">
-          QuizArena
+          QuizSpark
         </Link>
       </header>
 

@@ -20,7 +20,7 @@ export const Route = createFileRoute("/")({
   },
   head: () => ({
     meta: [
-      { title: "QuizArena — Join a Live Quiz with a Game PIN" },
+      { title: "QuizSpark — Join a Live Quiz with a Game PIN" },
       {
         name: "description",
         content:
@@ -28,7 +28,7 @@ export const Route = createFileRoute("/")({
       },
       {
         property: "og:title",
-        content: "QuizArena — Join a Live Quiz with a Game PIN",
+        content: "QuizSpark — Join a Live Quiz with a Game PIN",
       },
       {
         property: "og:description",
@@ -77,7 +77,7 @@ function Index() {
   return (
     <main className="ink-surface flex min-h-screen flex-col">
       <header className="flex items-center justify-between px-6 py-5">
-        <span className="display-title text-xl">QuizArena</span>
+        <span className="display-title text-xl">QuizSpark</span>
         <Button
           asChild
           variant="ghost"

@@ -17,13 +17,13 @@ import {
 export const Route = createFileRoute("/_authenticated/results/$sessionId")({
   head: () => ({
     meta: [
-      { title: "Session Results — QuizArena" },
+      { title: "Session Results — QuizSpark" },
       {
         name: "description",
         content:
-          "Final standings, accuracy and per-player scores for a completed QuizArena live session.",
+          "Final standings, accuracy and per-player scores for a completed QuizSpark live session.",
       },
-      { property: "og:title", content: "Session Results — QuizArena" },
+      { property: "og:title", content: "Session Results — QuizSpark" },
       {
         property: "og:description",
         content: "Review final standings and accuracy for your live quiz.",

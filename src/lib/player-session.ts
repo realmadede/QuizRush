@@ -6,7 +6,7 @@ export type PlayerCredentials = {
   avatar: string;
 };
 
-const KEY = "quizarena.player";
+const KEY = "quizspark.player";
 
 export function savePlayer(creds: PlayerCredentials) {
   if (typeof window === "undefined") return;

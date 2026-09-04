@@ -16,13 +16,13 @@ import { Label } from "@/components/ui/label";
 export const Route = createFileRoute("/_authenticated/host/$sessionId")({
   head: () => ({
     meta: [
-      { title: "Live Game Control — QuizArena" },
+      { title: "Live Game Control — QuizSpark" },
       {
         name: "description",
         content:
-          "Projector view and host controls for your live QuizArena session: PIN, questions, stats and leaderboard.",
+          "Projector view and host controls for your live QuizSpark session: PIN, questions, stats and leaderboard.",
       },
-      { property: "og:title", content: "Live Game Control — QuizArena" },
+      { property: "og:title", content: "Live Game Control — QuizSpark" },
       {
         property: "og:description",
         content:
