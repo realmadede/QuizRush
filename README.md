@@ -1,7 +1,7 @@
 
 # QuizSpark
 
-An interactive, real time classroom quiz application built to make learning engaging and competitive. 
+A real time classroom quiz application built to make learning engaging and competitive. 
 
 Teachers can create quizzes, host live game sessions, and broadcast questions in real time. Students join seamlessly using a 6 digit Game PIN on any mobile browser competing for the top spot on the live leaderboard.
 
